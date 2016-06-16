@@ -10,4 +10,30 @@ namespace AppBundle\Repository;
  */
 class MessageRepository extends \Doctrine\ORM\EntityRepository
 {
+
+    public function findAllDesc()
+    {
+        return $this->findBy(array(), array('id' => 'DESC'));
+    }
+
+    public function deleteLast($count)
+    {
+        $qb = $this->createQueryBuilder('m');
+        $query = $qb->select('m')
+            ->orderBy('m.id', 'DESC')
+            ->setMaxResults($count)
+            ->getQuery();
+
+        $res = $query->getResult();
+        $em = $this->getEntityManager();
+
+        foreach ($res as $message) {
+            $em->remove($message);
+        }
+
+        $em->flush();
+
+        return $res;
+    }
+    
 }

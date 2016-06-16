@@ -6,6 +6,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
+use AppBundle\Form\MessageType;
+
 class DefaultController extends Controller
 {
     /**
@@ -13,9 +15,21 @@ class DefaultController extends Controller
      */
     public function indexAction(Request $request)
     {
-        // replace this example code with whatever you need
+        $form = $this->createForm(MessageType::class);
+        $form->handleRequest($request);
+        if ($form->isValid()) {
+            $data = $form->getData();
+            $this->get('app.messages_manager')->saveMessage($data);
+            unset($form);
+            $form = $this->createForm(MessageType::class);
+        }
+
+        $em = $this->getDoctrine()->getManager();
+        $messages = $em->getRepository('AppBundle:Message')->findAllDesc();
+
         return $this->render('default/index.html.twig', [
-            'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
+            'form' => $form->createView(),
+            'messages' => $messages,
         ]);
     }
 }

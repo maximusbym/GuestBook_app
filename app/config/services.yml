@@ -7,3 +7,11 @@ services:
 #    service_name:
 #        class: AppBundle\Directory\ClassName
 #        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
+    app.messages_manager:
+        class: AppBundle\Messages\MessagesManager
+        arguments: ['@doctrine.orm.entity_manager','@fos_user.util.token_generator']
+    app.registering:
+        class: AppBundle\EventListener\RegistrationListener
+        arguments: ['@doctrine.orm.entity_manager','@router']
+        tags:
+            - { name: kernel.event_subscriber }
